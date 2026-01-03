@@ -1,0 +1,129 @@
+version: "3.8"
+
+services:
+    nginx:
+        build:
+            context: ./requirements/nginx
+            dockerfile: Dockerfile
+        ports:
+            - "443:443"
+        volumes:
+            - /home/k123/data/wordpress:/var/www/html
+        networks:
+            - inception
+
+    wordpress:
+        build:
+            context: ./requirements/wordpress
+            dockerfile: Dockerfile
+        container_name: wordpress
+        environment:
+            - WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}
+            - WORDPRESS_DB_USER=${WORDPRESS_DB_USER}
+            - WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME}
+            - MYSQL_USER=${MYSQL_USER}
+            - DOMAIN_NAME=${DOMAIN_NAME}
+            - WORDPRESS_DB_PASSWORD_FILE=/run/secrets/db_password
+            - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+        secrets:
+            - db_password
+        volumes:
+            - /home/k123/data/wordpress:/var/www/html
+        networks:
+            - inception
+        restart: always
+
+    mariadb:
+        build:
+            context: ./requirements/mariadb
+            dockerfile: Dockerfile
+        container_name: mariadb
+        environment:
+            - MYSQL_DATABASE=${MYSQL_DATABASE}
+            - MYSQL_USER=${MYSQL_USER}
+            - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_root_password
+            - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+        secrets:
+            - db_password
+            - db_root_password
+        ports:
+            - "3306:3306"
+        volumes:
+            - /home/k123/data/mariadb:/var/lib/mysql
+        networks:
+            - inception
+        restart: always
+
+    redis:
+        build:
+            context: ./requirements/bonus/redis
+            dockerfile: Dockerfile
+        container_name: redis
+        ports:
+            - "6379:6379"
+        networks:
+            - inception
+        restart: always
+
+    ftp:
+        build:
+            context: ./requirements/bonus/ftp
+            dockerfile: Dockerfile
+        container_name: ftp
+        environment:
+            - FTP_USER=${WORDPRESS_DB_USER}
+            - FTP_PASSWORD=${WORDPRESS_DB_PASSWORD}
+        volumes:
+            - /home/k123/data/wordpress:/var/www/html
+        ports:
+            - "20:20"
+            - "21:21"
+            - "21100:21100"
+        networks:
+            - inception
+        restart: always
+
+    adminer:
+        build:
+            context: ./requirements/bonus/adminer
+            dockerfile: Dockerfile
+        container_name: adminer
+        ports:
+            - "8080:8080"
+        networks:
+            - inception
+        restart: always
+
+    website:
+        build:
+            context: ./requirements/bonus/website
+            dockerfile: Dockerfile
+        container_name: website
+        ports:
+            - "3000:3000"
+        networks:
+            - inception
+        restart: always
+
+    uptime:
+        build:
+            context: ./requirements/bonus/uptime
+            dockerfile: Dockerfile
+        container_name: uptime
+        ports:
+            - "8888:8888"
+        networks:
+            - inception
+        restart: always
+
+networks:
+    inception:
+        driver: bridge
+
+secrets:
+    db_password:
+        file: ../secrets/db_password.txt
+    db_root_password:
+        file: ../secrets/db_root_password.txt
+
+
