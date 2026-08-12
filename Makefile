@@ -1,27 +1,23 @@
-name = inception
+NAME = inception
 
-all:
-	@mkdir -p /home/k123/data/wordpress
-	@mkdir -p /home/k123/data/mariadb
-	@docker-compose -f ./srcs/docker-compose.yml up -d --build
+all: $(NAME)
+
+$(NAME):
+	@mkdir -p /Users/electrolux/data/wordpress
+	@mkdir -p /Users/electrolux/data/mariadb
+	@docker compose -f srcs/docker-compose.yml up -d --build
 
 down:
-	@docker-compose -f ./srcs/docker-compose.yml down
-
-re: down
-	@docker-compose -f ./srcs/docker-compose.yml up -d --build
+	@docker compose -f srcs/docker-compose.yml down
 
 clean: down
-	@docker system prune -a
-	@sudo rm -rf /home/k123/data/wordpress/*
-	@sudo rm -rf /home/k123/data/mariadb/*
+	@docker compose -f srcs/docker-compose.yml down -v
 
-fclean:
-	@docker stop $$(docker ps -qa) 2>/dev/null || true
-	@docker system prune --all --force --volumes
-	@docker network prune --force
-	@docker volume prune --force
-	@sudo rm -rf /home/k123/data/wordpress/*
-	@sudo rm -rf /home/k123/data/mariadb/*
+fclean: clean
+	@docker system prune -af
+	@sudo rm -rf /Users/electrolux/data/wordpress/*
+	@sudo rm -rf /Users/electrolux/data/mariadb/*
 
-.PHONY	: all build down re clean fclean
+re: fclean all
+
+.PHONY: all down clean fclean re

@@ -1,36 +1,25 @@
 # Developer Documentation
 
-## Environment Setup
-1. **Prerequisites**:
-   - Linux VM (Debian/Ubuntu recommended)
-   - Docker Engine & Docker Compose (v2+)
-   - `make`
-   - `sudo` privileges for setup
+## Introduction
 
-2. **Configuration**:
-   - Environment variables are in `srcs/.env`.
-   - Secrets are in `secrets/*.txt`.
-   - Host mapping in `/etc/hosts` is required for the domain `k123.42.fr`.
+This file is tailored for developers setting up, maintaining, or scaling the Inception infrastructure. It details configuration methods and basic troubleshooting concepts required when modifying the Docker Compose setup.
 
-## Build & Launch
-The project uses `Makefile` to simplify Docker commands.
-- `make build`: Rebuilds images without starting.
-- `make re`: Rebuilds and restarts containers.
-- `make clean`: Stops containers and removes network.
-- `make fclean`: Deep clean - removes containers, images, volumes, and networks.
+## Setup Environment from Scratch
+1. **Prerequisites**: Make sure Docker, docker-compose, and make are available. Add `127.0.0.1 electrolux.42.fr` to the `/etc/hosts` file.
+2. **Configuration Files**: Three containers require dedicated config directories inside `srcs/requirements`.
+   - `mariadb`: Requires `conf/50-server.cnf` and an entrypoint script `tools/setup.sh`.
+   - `wordpress`: Built on top of `php-fpm`. Uses `wp-cli` in `tools/setup.sh` to download and install.
+   - `nginx`: Built using `openssl` in `tools/setup.sh` and maps to `conf/nginx.conf`.
+3. **Secrets**: Crucial variables like database passwords must be stored inside files within the `secrets/` root folder. Make sure `.env` refers to them properly with the `run/secrets/` path in the container scope.
 
-## Architecture
-- **Docker Compose**: `srcs/docker-compose.yml` is the source of truth.
-- **Data Persistence**:
-  - MariaDB data: `/home/k123/data/mariadb`
-  - WordPress files: `/home/k123/data/wordpress`
-  > *Note: These are bind mounts. Deleting these folders resets the application state.*
+## Build and Launch
+- Use `make` (alias for `docker compose -f srcs/docker-compose.yml up -d --build`).
+- Inspect building details via `docker compose -f srcs/docker-compose.yml build --no-cache`.
+- Check if containers are restarting constantly using `make logs` or `docker compose ... logs -f`.
 
-## Container Management
-- **Logs**: `docker compose -f srcs/docker-compose.yml logs -f`
-- **Shell Access**:
-  ```bash
-  docker exec -it wordpress sh
-  docker exec -it mariadb sh
-  docker exec -it nginx sh
-  ```
+## Data Storage
+Docker persistency relies on volumes managed locally:
+- `mariadb` maps `/var/lib/mysql` to the named volume `mariadb` which directs host to `/home/electrolux/data/mariadb`.
+- `wordpress` maps `/var/www/html` to `/home/electrolux/data/wordpress`.
+
+Always be mindful that modifying the files inside these mapped directories directly on the host alters the running state without checking `.gitignore`.

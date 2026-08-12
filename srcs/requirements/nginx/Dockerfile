@@ -1,15 +1,16 @@
-FROM alpine:3.20
+FROM alpine:3.19
 
-RUN apk update && apk add --no-cache nginx openssl
+RUN apk update && apk add --no-cache nginx openssl \
+    && mkdir -p /etc/nginx/http.d
 
-RUN mkdir -p /etc/nginx/ssl
-
-RUN openssl req -x509 -nodes -out /etc/nginx/ssl/inception.crt -keyout /etc/nginx/ssl/inception.key -subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=k123.42.fr/UID=k123"
-
-RUN mkdir -p /var/run/nginx
+ARG DOMAIN_NAME
+ENV DOMAIN_NAME=${DOMAIN_NAME}
 
 COPY conf/nginx.conf /etc/nginx/http.d/default.conf
+COPY tools/setup.sh /usr/local/bin/setup.sh
+
+RUN chmod +x /usr/local/bin/setup.sh
 
 EXPOSE 443
 
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/usr/local/bin/setup.sh"]

@@ -1,35 +1,47 @@
 # User Documentation
 
-## Overview
-This stack provides a complete WordPress environment with a dedicated database and TLS-secured access.
+## Introduction
 
-## Starting the Project
-To start the services:
+This document provides instructions for an end user or administrator to start, stop, and access the services provided by the Inception infrastructure.
+
+## Services Provided
+- **Nginx**: A web server securely handling SSL/TLS limits in front of the application.
+- **WordPress**: A fully functional content management system available via a local domain name.
+- **MariaDB**: The backend database engine persistently storing all website data securely via Docker secrets.
+
+## Managing the Infrastructure
+
+### Start the Project
+Navigate to the root directory `inception` and execute:
 ```bash
 make
 ```
+This automatically manages directory initialization and starts all required Docker containers properly.
 
-To stop the services:
+### Stop the Project
+To bring down the project gracefully:
 ```bash
 make down
 ```
-
-## Accessing Services
-- **Website**: Open [https://k123.42.fr](https://k123.42.fr) in your browser.
-- **Admin Panel**: Go to [https://k123.42.fr/wp-admin](https://k123.42.fr/wp-admin).
-
-## Credentials
-Credentials are securely managed. For local testing, default values are:
-- **WordPress Admin**: `admin` / (See `srcs/.env` or secrets)
-- **Database User**: `wordpress` / `123456`
-
-To manage credentials securely, edit the files in the `secrets/` directory:
-- `secrets/db_password.txt`
-- `secrets/db_root_password.txt`
-
-## Verification
-You can check if services are running with:
+To fully remove containers and volumes:
 ```bash
-docker ps
+make clean
 ```
-You should see 3 containers: `nginx`, `wordpress`, `mariadb`.
+To fully remove images and clean the system:
+```bash
+make fclean
+```
+
+## Accessing the Website
+- **Website**: Open a browser and navigate to `https://electrolux.42.fr` (accept the self-signed certificate exception).
+- **Admin Panel**: Navigate to `https://electrolux.42.fr/wp-admin`. The login credentials correspond to `WP_ADMIN_USER` and `WP_ADMIN_PASSWORD_FILE` stored safely in the `.env` file and secrets directory.
+
+## Checking the Services
+You can verify the services are running correctly by checking docker containers:
+```bash
+docker compose -f srcs/docker-compose.yml ps
+```
+Or check the logs of a specific service:
+```bash
+docker compose -f srcs/docker-compose.yml logs nginx
+```
