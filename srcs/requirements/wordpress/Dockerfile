@@ -20,6 +20,7 @@ RUN mkdir -p /run/php \
     && chown -R www-data:www-data /var/www/html /run/php
 
 COPY conf/www.conf /etc/php82/php-fpm.d/www.conf
+RUN echo "memory_limit = 512M" > /etc/php82/conf.d/99-inception.ini
 
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
     && chmod +x wp-cli.phar \

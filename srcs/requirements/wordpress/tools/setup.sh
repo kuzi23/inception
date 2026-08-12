@@ -2,7 +2,7 @@
 set -e
 
 WP_ADMIN_PASSWORD=$(cat /run/secrets/credentials)
-WP_USER_PASSWORD=$(cat /run/secrets/credentials)
+WP_USER_PASSWORD=$(cat /run/secrets/wp_user_password)
 
 cd /var/www/html
 

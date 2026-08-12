@@ -5,7 +5,7 @@
 This file is tailored for developers setting up, maintaining, or scaling the Inception infrastructure. It details configuration methods and basic troubleshooting concepts required when modifying the Docker Compose setup.
 
 ## Setup Environment from Scratch
-1. **Prerequisites**: Make sure Docker, docker-compose, and make are available. Add `127.0.0.1 electrolux.42.fr` to the `/etc/hosts` file.
+1. **Prerequisites**: Make sure Docker, docker-compose, and make are available. Add `127.0.0.1 mkwizera.42.fr` to the `/etc/hosts` file.
 2. **Configuration Files**: Three containers require dedicated config directories inside `srcs/requirements`.
    - `mariadb`: Requires `conf/50-server.cnf` and an entrypoint script `tools/setup.sh`.
    - `wordpress`: Built on top of `php-fpm`. Uses `wp-cli` in `tools/setup.sh` to download and install.
@@ -19,7 +19,7 @@ This file is tailored for developers setting up, maintaining, or scaling the Inc
 
 ## Data Storage
 Docker persistency relies on volumes managed locally:
-- `mariadb` maps `/var/lib/mysql` to the named volume `mariadb` which directs host to `/home/electrolux/data/mariadb`.
-- `wordpress` maps `/var/www/html` to `/home/electrolux/data/wordpress`.
+- `mariadb` maps `/var/lib/mysql` to the named volume `mariadb` which directs host to `/home/mkwizera/data/mariadb`.
+- `wordpress` maps `/var/www/html` to `/home/mkwizera/data/wordpress`.
 
 Always be mindful that modifying the files inside these mapped directories directly on the host alters the running state without checking `.gitignore`.

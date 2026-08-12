@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by electrolux.*
+*This project has been created as part of the 42 curriculum by mkwizera.*
 
 # Inception
 
@@ -7,18 +7,21 @@ This project aims to broaden knowledge of system administration by using Docker.
 
 ## Instructions
 1. Ensure Docker and Docker Compose are installed on your VM.
-2. Update `/etc/hosts` to point `electrolux.42.fr` to `127.0.0.1`.
+2. Update `/etc/hosts` to point `mkwizera.42.fr` to `127.0.0.1`.
 3. Create the required volume directories (the Makefile will attempt this for you):
    ```
-   mkdir -p /home/electrolux/data/wordpress
-   mkdir -p /home/electrolux/data/mariadb
+   mkdir -p /home/mkwizera/data/wordpress
+   mkdir -p /home/mkwizera/data/mariadb
    ```
 4. Run `make` to build and launch the containers.
-5. The site will be available at `https://electrolux.42.fr`.
+5. The site will be available at `https://mkwizera.42.fr`.
 
 ## Resources
 - Docker documentation: https://docs.docker.com/
 - Nginx documentation: https://nginx.org/en/docs/
+
+## AI Usage Disclosure
+AI assistance (GitHub Copilot) was used during this project to help audit the repository against the subject requirements (checking Dockerfiles, `docker-compose.yml`, secrets handling, TLS configuration, and documentation consistency) and to draft/fix the documentation files (`README.md`, `USER_DOC.md`, `DEV_DOC.md`). All infrastructure code, Dockerfiles, and configuration were reviewed and understood before being kept in the final submission.
 
 ## Technical Choices
 

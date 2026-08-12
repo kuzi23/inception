@@ -3,8 +3,8 @@ NAME = inception
 all: $(NAME)
 
 $(NAME):
-	@mkdir -p /Users/electrolux/data/wordpress
-	@mkdir -p /Users/electrolux/data/mariadb
+	@mkdir -p /home/mkwizera/data/wordpress
+	@mkdir -p /home/mkwizera/data/mariadb
 	@docker compose -f srcs/docker-compose.yml up -d --build
 
 down:
@@ -15,8 +15,8 @@ clean: down
 
 fclean: clean
 	@docker system prune -af
-	@sudo rm -rf /Users/electrolux/data/wordpress/*
-	@sudo rm -rf /Users/electrolux/data/mariadb/*
+	@sudo rm -rf /home/mkwizera/data/wordpress/*
+	@sudo rm -rf /home/mkwizera/data/mariadb/*
 
 re: fclean all
 

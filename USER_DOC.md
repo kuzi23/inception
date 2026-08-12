@@ -33,8 +33,8 @@ make fclean
 ```
 
 ## Accessing the Website
-- **Website**: Open a browser and navigate to `https://electrolux.42.fr` (accept the self-signed certificate exception).
-- **Admin Panel**: Navigate to `https://electrolux.42.fr/wp-admin`. The login credentials correspond to `WP_ADMIN_USER` and `WP_ADMIN_PASSWORD_FILE` stored safely in the `.env` file and secrets directory.
+- **Website**: Open a browser and navigate to `https://mkwizera.42.fr` (accept the self-signed certificate exception).
+- **Admin Panel**: Navigate to `https://mkwizera.42.fr/wp-admin`. The login credentials correspond to `WP_ADMIN_USER` and `WP_ADMIN_PASSWORD_FILE` stored safely in the `.env` file and secrets directory.
 
 ## Checking the Services
 You can verify the services are running correctly by checking docker containers:
