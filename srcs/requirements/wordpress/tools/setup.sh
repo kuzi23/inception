@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-WP_ADMIN_PASSWORD=$(cat /run/secrets/credentials)
-WP_USER_PASSWORD=$(cat /run/secrets/wp_user_password)
+WP_ADMIN_PASSWORD=$(cat ${WP_ADMIN_PASSWORD_FILE})
+WP_USER_PASSWORD=$(cat ${WP_USER_PASSWORD_FILE})
 
 cd /var/www/html
 

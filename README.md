@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by mkwizera.*
+*This project has been created as part of the 42 curriculum by mkwizera*
 
 # Inception
 
@@ -19,11 +19,10 @@ This project aims to broaden knowledge of system administration by using Docker.
 ## Resources
 - Docker documentation: https://docs.docker.com/
 - Nginx documentation: https://nginx.org/en/docs/
+- **AI usage**: GitHub Copilot was used to audit the repository against the subject requirements (checking Dockerfiles, `docker-compose.yml`, secrets handling, TLS configuration, and documentation consistency) and to draft/fix the documentation files (`README.md`, `USER_DOC.md`, `DEV_DOC.md`). All infrastructure code, Dockerfiles, and configuration were reviewed and understood before being kept in the final submission.
 
-## AI Usage Disclosure
-AI assistance (GitHub Copilot) was used during this project to help audit the repository against the subject requirements (checking Dockerfiles, `docker-compose.yml`, secrets handling, TLS configuration, and documentation consistency) and to draft/fix the documentation files (`README.md`, `USER_DOC.md`, `DEV_DOC.md`). All infrastructure code, Dockerfiles, and configuration were reviewed and understood before being kept in the final submission.
-
-## Technical Choices
+## Project Description
+This project builds a small multi-container infrastructure with Docker Compose: each service (NGINX, WordPress/php-fpm, MariaDB) runs in its own container built from a dedicated Dockerfile, communicating over a private Docker network and persisting data on the host through named volumes.
 
 ### Virtual Machines vs Docker
 Virtual Machines abstract hardware, running a full guest OS, which makes them heavy but completely isolated. Docker containers abstract the application layer, sharing the host OS kernel. This makes containers lightweight and faster to start up.

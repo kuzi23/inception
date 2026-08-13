@@ -20,4 +20,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all down clean fclean re
+.PHONY: all down clean fclean re $(NAME)
