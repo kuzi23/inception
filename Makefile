@@ -1,23 +1,23 @@
-NAME = inception
+COMPOSE := $(shell if docker compose version >/dev/null 2>&1; then echo "docker compose"; elif command -v docker-compose >/dev/null 2>&1; then echo "docker-compose"; fi)
 
-all: $(NAME)
+ifeq ($(strip $(COMPOSE)),)
+$(error Neither 'docker compose' nor 'docker-compose' is available. Install Docker Compose and try again.)
+endif
 
-$(NAME):
-	@mkdir -p /home/mkwizera/data/wordpress
-	@mkdir -p /home/mkwizera/data/mariadb
-	@docker compose -f srcs/docker-compose.yml up -d --build
+all:
+	@$(COMPOSE) -f ./srcs/docker-compose.yml up
 
 down:
-	@docker compose -f srcs/docker-compose.yml down
+	@$(COMPOSE) -f ./srcs/docker-compose.yml down
 
-clean: down
-	@docker compose -f srcs/docker-compose.yml down -v
+re:
+	@$(COMPOSE) -f srcs/docker-compose.yml up --build
 
-fclean: clean
-	@docker system prune -af
-	@sudo rm -rf /home/mkwizera/data/wordpress/*
-	@sudo rm -rf /home/mkwizera/data/mariadb/*
+clean:
+	@docker stop $$(docker ps -qa);\
+	docker rm $$(docker ps -qa);\
+	docker rmi -f $$(docker images -qa);\
+	docker volume rm $$(docker volume ls -q);\
+	docker network rm $$(docker network ls -q);\
 
-re: fclean all
-
-.PHONY: all down clean fclean re $(NAME)
+.PHONY: all re down clean

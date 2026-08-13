@@ -1,37 +1,97 @@
-*This project has been created as part of the 42 curriculum by mkwizera*
+*This project has been created as part of the 42 curriculum by mkwizera.*
 
 # Inception
 
 ## Description
-This project aims to broaden knowledge of system administration by using Docker. We virtualize several Docker images, creating them in a personal virtual machine. It consists of setting up a small infrastructure composed of NGINX, WordPress, and MariaDB under specific rules.
+
+Inception is a containerized infrastructure project built with Docker Compose inside a virtual machine. The mandatory stack contains:
+- NGINX as the single public entrypoint on port 443 (HTTPS)
+- WordPress running with PHP-FPM
+- MariaDB as the database backend
+
+Goal:
+- Build each service from custom Dockerfiles (no ready-made service images)
+- Connect services through an isolated Docker network
+- Persist data with Docker named volumes
+- Manage runtime configuration with environment variables and local secrets
 
 ## Instructions
-1. Ensure Docker and Docker Compose are installed on your VM.
-2. Update `/etc/hosts` to point `mkwizera.42.fr` to `127.0.0.1`.
-3. Create the required volume directories (the Makefile will attempt this for you):
-   ```
-   mkdir -p /home/mkwizera/data/wordpress
-   mkdir -p /home/mkwizera/data/mariadb
-   ```
-4. Run `make` to build and launch the containers.
-5. The site will be available at `https://mkwizera.42.fr`.
 
-## Resources
-- Docker documentation: https://docs.docker.com/
-- Nginx documentation: https://nginx.org/en/docs/
-- **AI usage**: GitHub Copilot was used to audit the repository against the subject requirements (checking Dockerfiles, `docker-compose.yml`, secrets handling, TLS configuration, and documentation consistency) and to draft/fix the documentation files (`README.md`, `USER_DOC.md`, `DEV_DOC.md`). All infrastructure code, Dockerfiles, and configuration were reviewed and understood before being kept in the final submission.
+1. Set host resolution (local machine):
+```txt
+127.0.0.1 mkwizera.42.fr
+```
 
-## Project Description
-This project builds a small multi-container infrastructure with Docker Compose: each service (NGINX, WordPress/php-fpm, MariaDB) runs in its own container built from a dedicated Dockerfile, communicating over a private Docker network and persisting data on the host through named volumes.
+2. Create local secret files:
+```sh
+echo "strong_db_password" > secrets/db_password.txt
+echo "strong_root_password" > secrets/db_root_password.txt
+chmod 600 secrets/db_password.txt secrets/db_root_password.txt
+```
+
+3. Adjust non-secret variables in `srcs/.env`.
+
+4. Build and start:
+```sh
+make
+```
+
+5. Stop:
+```sh
+make down
+```
+
+6. Clean everything:
+```sh
+make clean
+```
+
+## Technical Choices
 
 ### Virtual Machines vs Docker
-Virtual Machines abstract hardware, running a full guest OS, which makes them heavy but completely isolated. Docker containers abstract the application layer, sharing the host OS kernel. This makes containers lightweight and faster to start up.
+
+- VM: full guest OS per instance, stronger isolation, heavier resource usage.
+- Docker: shared host kernel, faster startup, smaller footprint, ideal for service-oriented local infrastructure.
+
+This project uses Docker because the objective is reproducible service orchestration, not full OS virtualization.
 
 ### Secrets vs Environment Variables
-Environment variables can be inspected by anyone with access to the container or docker inspect commands. Docker secrets provide a mechanism to securely transmit passwords which are mounted as read-only files in memory `/run/secrets/`, keeping them out of environment dumps.
+
+- Environment variables are convenient for non-sensitive configuration (domain, usernames, titles).
+- Secrets are safer for sensitive values (database passwords), because they are injected at runtime from files and should remain outside Git.
+
+This project uses both:
+- `srcs/.env` for non-sensitive runtime configuration
+- `secrets/*.txt` for passwords
 
 ### Docker Network vs Host Network
-Using the host network maps all the container ports directly to the host interface without isolation. A custom Docker bridge network (`inception`) encapsulates communication between containers securely, only exposing specifically mapped ports (like 443) to the outside.
+
+- Docker bridge network isolates containers and provides service-to-service DNS.
+- Host network bypasses this isolation and is explicitly forbidden by the project rules.
+
+This stack uses a dedicated bridge network so services communicate internally by service name.
 
 ### Docker Volumes vs Bind Mounts
-Bind mounts depend on the directory structure and OS of the host machine, tying the container to specific host paths. Docker volumes are managed entirely by Docker, providing better portability and performance across different environments. However, in this project, we explicitly use "named volumes" backed by a local driver to simulate persistent host data.
+
+- Docker named volumes are managed by Docker and are portable within Compose workflows.
+- Bind mounts directly map host paths and couple runtime behavior to host filesystem layout.
+
+This stack persists WordPress and MariaDB data in named volumes.
+
+## Resources
+
+- Docker documentation: https://docs.docker.com/
+- Docker Compose specification: https://compose-spec.io/
+- NGINX documentation: https://nginx.org/en/docs/
+- MariaDB documentation: https://mariadb.com/kb/en/documentation/
+- WordPress + WP-CLI docs: https://wordpress.org/support/ and https://developer.wordpress.org/cli/commands/
+
+## AI Usage
+
+AI was used for:
+- Compliance audit against the written subject requirements
+- Refactoring startup scripts for secrets-based runtime initialization
+- Drafting repository documentation (README, USER_DOC, DEV_DOC)
+
+All generated suggestions were reviewed and adapted for this repository before applying.
+

@@ -1,25 +1,79 @@
-# Developer Documentation
+# DEV_DOC
 
-## Introduction
+## Prerequisites
 
-This file is tailored for developers setting up, maintaining, or scaling the Inception infrastructure. It details configuration methods and basic troubleshooting concepts required when modifying the Docker Compose setup.
+- Linux VM environment
+- Docker Engine installed
+- Docker Compose v2 (`docker compose`)
+- Local domain mapping for `mkwizera.42.fr`
 
-## Setup Environment from Scratch
-1. **Prerequisites**: Make sure Docker, docker-compose, and make are available. Add `127.0.0.1 mkwizera.42.fr` to the `/etc/hosts` file.
-2. **Configuration Files**: Three containers require dedicated config directories inside `srcs/requirements`.
-   - `mariadb`: Requires `conf/50-server.cnf` and an entrypoint script `tools/setup.sh`.
-   - `wordpress`: Built on top of `php-fpm`. Uses `wp-cli` in `tools/setup.sh` to download and install.
-   - `nginx`: Built using `openssl` in `tools/setup.sh` and maps to `conf/nginx.conf`.
-3. **Secrets**: Crucial variables like database passwords must be stored inside files within the `secrets/` root folder. Make sure `.env` refers to them properly with the `run/secrets/` path in the container scope.
+## Initial Setup
 
-## Build and Launch
-- Use `make` (alias for `docker compose -f srcs/docker-compose.yml up -d --build`).
-- Inspect building details via `docker compose -f srcs/docker-compose.yml build --no-cache`.
-- Check if containers are restarting constantly using `make logs` or `docker compose ... logs -f`.
+1. Clone repository and enter project root.
+2. Create local secret files:
+```sh
+echo "strong_db_password" > secrets/db_password.txt
+echo "strong_root_password" > secrets/db_root_password.txt
+chmod 600 secrets/db_password.txt secrets/db_root_password.txt
+```
+3. Update runtime variables in `srcs/.env`.
 
-## Data Storage
-Docker persistency relies on volumes managed locally:
-- `mariadb` maps `/var/lib/mysql` to the named volume `mariadb` which directs host to `/home/mkwizera/data/mariadb`.
-- `wordpress` maps `/var/www/html` to `/home/mkwizera/data/wordpress`.
+## Build And Launch
 
-Always be mindful that modifying the files inside these mapped directories directly on the host alters the running state without checking `.gitignore`.
+- Start stack:
+```sh
+make
+```
+
+- Rebuild stack:
+```sh
+make re
+```
+
+- Stop stack:
+```sh
+make down
+```
+
+- Full cleanup:
+```sh
+make clean
+```
+
+## Useful Docker Commands
+
+- Compose config validation:
+```sh
+docker compose -f srcs/docker-compose.yml config
+```
+
+- List containers:
+```sh
+docker ps -a
+```
+
+- Inspect volumes:
+```sh
+docker volume ls
+docker volume inspect wp db
+```
+
+- Follow logs:
+```sh
+docker logs -f nginx
+docker logs -f wordpress
+docker logs -f mariadb
+```
+
+## Data Persistence
+
+- Database data is persisted in named volume `db`.
+- WordPress files are persisted in named volume `wp`.
+- Verify after restart by recreating containers and checking content is still present.
+
+## Project Layout
+
+- Compose: `srcs/docker-compose.yml`
+- NGINX: `srcs/requirements/nginx`
+- WordPress: `srcs/requirements/wordpress`
+- MariaDB: `srcs/requirements/mariadb`

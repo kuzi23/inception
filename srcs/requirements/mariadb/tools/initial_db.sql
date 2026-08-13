@@ -1,0 +1,2 @@
+-- This file is intentionally kept as a reference.
+-- Runtime initialization now happens in mariadb_start.sh using environment variables and secrets.

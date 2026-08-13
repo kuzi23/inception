@@ -1,47 +1,71 @@
-# User Documentation
+# USER_DOC
 
-## Introduction
+This stack provides three services:
+- NGINX (TLS termination on port 443)
+- WordPress with PHP-FPM
+- MariaDB database
 
-This document provides instructions for an end user or administrator to start, stop, and access the services provided by the Inception infrastructure.
+## Start And Stop
 
-## Services Provided
-- **Nginx**: A web server securely handling SSL/TLS limits in front of the application.
-- **WordPress**: A fully functional content management system available via a local domain name.
-- **MariaDB**: The backend database engine persistently storing all website data securely via Docker secrets.
+1. Create local secrets:
+```sh
+echo "strong_db_password" > secrets/db_password.txt
+echo "strong_root_password" > secrets/db_root_password.txt
+chmod 600 secrets/db_password.txt secrets/db_root_password.txt
+```
 
-## Managing the Infrastructure
+2. Review runtime variables:
+```sh
+cat srcs/.env
+```
 
-### Start the Project
-Navigate to the root directory `inception` and execute:
-```bash
+3. Build and start:
+```sh
 make
 ```
-This automatically manages directory initialization and starts all required Docker containers properly.
 
-### Stop the Project
-To bring down the project gracefully:
-```bash
+4. Stop containers:
+```sh
 make down
 ```
-To fully remove containers and volumes:
-```bash
+
+5. Remove full stack resources:
+```sh
 make clean
 ```
-To fully remove images and clean the system:
-```bash
-make fclean
+
+## Access
+
+- Website: https://mkwizera.42.fr
+- WordPress admin panel: https://mkwizera.42.fr/wp-admin
+
+If DNS is not configured yet, map the domain to local host:
+```txt
+127.0.0.1 mkwizera.42.fr
 ```
 
-## Accessing the Website
-- **Website**: Open a browser and navigate to `https://mkwizera.42.fr` (accept the self-signed certificate exception).
-- **Admin Panel**: Navigate to `https://mkwizera.42.fr/wp-admin`. The login credentials correspond to `WP_ADMIN_USER` and `WP_ADMIN_PASSWORD_FILE` stored safely in the `.env` file and secrets directory.
+## Credentials
 
-## Checking the Services
-You can verify the services are running correctly by checking docker containers:
-```bash
-docker compose -f srcs/docker-compose.yml ps
+- Non-secret config values are stored in `srcs/.env`.
+- Database secret values are read from:
+- `secrets/db_password.txt`
+- `secrets/db_root_password.txt`
+
+## Health Checks
+
+Check running containers:
+```sh
+docker ps
 ```
-Or check the logs of a specific service:
-```bash
-docker compose -f srcs/docker-compose.yml logs nginx
+
+Check logs:
+```sh
+docker logs nginx
+docker logs wordpress
+docker logs mariadb
+```
+
+Check HTTPS response:
+```sh
+curl -kI https://mkwizera.42.fr
 ```

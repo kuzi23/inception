@@ -1,37 +1,16 @@
-FROM alpine:3.19
+FROM debian:11.9-slim
 
-RUN apk update && apk add --no-cache \
-    php82 \
-    php82-fpm \
-    php82-mysqli \
-    php82-phar \
-    php82-mbstring \
-    php82-openssl \
-    curl \
-    mariadb-client \
-    wget \
-    tar
-
-RUN addgroup -S www-data 2>/dev/null || true \
-    && adduser -S -D -H -G www-data www-data 2>/dev/null || true
-
-RUN mkdir -p /run/php \
-    && mkdir -p /var/www/html \
-    && chown -R www-data:www-data /var/www/html /run/php
-
-COPY conf/www.conf /etc/php82/php-fpm.d/www.conf
-RUN echo "memory_limit = 512M" > /etc/php82/conf.d/99-inception.ini
-
-RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
-    && chmod +x wp-cli.phar \
-    && mv wp-cli.phar /usr/local/bin/wp \
-    && ln -sf /usr/bin/php82 /usr/bin/php
-
-COPY tools/setup.sh /usr/local/bin/setup.sh
-RUN chmod +x /usr/local/bin/setup.sh
-
-WORKDIR /var/www/html
+RUN apt-get update && apt-get install -y --no-install-recommends \
+	php-fpm php-mysqli php-cli curl ca-certificates mariadb-client \
+	&& rm -rf /var/lib/apt/lists/*
 
 EXPOSE 9000
 
-ENTRYPOINT ["/usr/local/bin/setup.sh"]
+COPY ./conf/www.conf /etc/php/7.4/fpm/pool.d
+COPY ./tools /var/www/
+
+RUN chmod +x /var/www/wordpress_start.sh
+
+ENTRYPOINT [ "/var/www/wordpress_start.sh" ]
+
+CMD ["/usr/sbin/php-fpm7.4", "--nodaemonize"]

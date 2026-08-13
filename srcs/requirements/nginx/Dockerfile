@@ -1,16 +1,14 @@
-FROM alpine:3.19
+FROM debian:11.9-slim
 
-RUN apk update && apk add --no-cache nginx openssl \
-    && mkdir -p /etc/nginx/http.d
-
-ARG DOMAIN_NAME
-ENV DOMAIN_NAME=${DOMAIN_NAME}
-
-COPY conf/nginx.conf /etc/nginx/http.d/default.conf
-COPY tools/setup.sh /usr/local/bin/setup.sh
-
-RUN chmod +x /usr/local/bin/setup.sh
+RUN apt-get update && apt-get install -y --no-install-recommends nginx openssl && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 443
 
-ENTRYPOINT ["/usr/local/bin/setup.sh"]
+COPY ./conf/default /etc/nginx/sites-enabled/default
+COPY ./tools/nginx_start.sh /var/www
+
+RUN chmod +x /var/www/nginx_start.sh
+
+ENTRYPOINT ["/var/www/nginx_start.sh"]
+
+CMD ["nginx", "-g", "daemon off;"]
